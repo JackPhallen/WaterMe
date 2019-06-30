@@ -3,6 +3,7 @@ import {View, Text, Button, StyleSheet, FlatList, TouchableOpacity, Image} from 
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
+import * as Storage from '../utils/StoreData'
 import * as Actions from '../actions/plants.actions';
 
 class PlantList extends React.Component {
@@ -10,9 +11,6 @@ class PlantList extends React.Component {
     const { params = {} } = navigation.state;
     return {
       title: 'My Plants',
-      headerStyle: {
-        backgroundColor: '#7ab640',
-      },
       headerStyle: {
         backgroundColor: '#7ab640',
       },
@@ -41,53 +39,77 @@ class PlantList extends React.Component {
       
   constructor(props) {
     super(props);
-    this._onAddPlant = this._onAddPlant.bind(this)
+    this._onAddPlant = this._onAddPlant.bind(this);
     this.state = {
-      newPlant: {
-        desc: "two flower",
-        name: "new flower"
-      },
-      yeet: "yaw"
+      loading: true
     };
-
   }
+
+  componentDidMount(){
+    this._loadPlants();
+    this.props.actions$storePlants();
+    this.props.navigation.setParams({ onAddPlant: this._onAddPlant });
+  }
+
+  _loadPlants() {
+    Storage.retrieveData().then((promise) => {
+      let resolvedState = JSON.parse(promise);
+      this.props.actions$setPlants(resolvedState);
+      this.setState({ loading: false });
+      //Ensure plants are always stored
+      this.props.actions$storePlants();
+    }).catch((error) => {
+      console.log('Promise is rejected with error: ' + error);
+    });
+  }
+
 
   _onAddPlant() {
     this.props.navigation.navigate('AddPlant');
   }
 
-  componentDidMount(){
-    this.props.actions$getPlants();
-    this.props.navigation.setParams({ test: 1 });
-    this.props.navigation.setParams({ onAddPlant: this._onAddPlant });
+  _onPlantPress(plant) {
+    console.log("press");
   }
 
+  _onPlantLongPress(plant) {
+    console.log("long");
+  }
 
   render() {
-    return (
-      <View style={styles.main}>
-        <View style={ styles.plantList }>
-          <FlatList
-            data={ this.props.plants }
-            renderItem={ ({ item }) => 
-            <TouchableOpacity 
-              style={ styles.plant }>
-              <View style={ styles.plantContent }>
-                <View style={ styles.imageCont }>
-                <Image 
-                  source={ require('../assets/flower-icon.png') }
-                  style={ styles.image } />
+    if (this.state.loading) { 
+      return (<View style={ styles.main }></View>);
+    } else {
+      return (
+        <View style={styles.main}>
+          <View style={ styles.plantList }>
+            <FlatList
+              data={ this.props.plants }
+              renderItem={ ({ item }) => 
+                <View>
+                  <TouchableOpacity 
+                    style={ styles.plant }
+                    onPress={ () => this._onPlantPress( item )}
+                    onLongPress={ () => this._onPlantLongPress( item )}
+                    >
+                    <View style={ styles.plantContent }>
+                      <View style={ styles.imageCont }>
+                      <Image 
+                        source={ require('../assets/flower-icon.png') }
+                        style={ styles.image } />
+                      </View>
+                        <View style={ styles.plantDesc }>
+                          <Text style={ styles.plantName }> { item.key } </Text>
+                          <Text style={ styles.plantInfo }> { item.desc } </Text>
+                        </View>
+                    </View>
+                  </TouchableOpacity>
                 </View>
-                  <View style={ styles.plantDesc }>
-                    <Text style={ styles.plantName }> { item.key } </Text>
-                    <Text style={ styles.plantInfo }> { item.desc } </Text>
-                  </View>
-              </View>
-            </TouchableOpacity>
-            }/>
+              }/>
+          </View>
         </View>
-      </View>
-    );
+      );
+    }
   }
 }
 
@@ -120,7 +142,8 @@ const styles = StyleSheet.create({
     height: 100,
     borderBottomWidth: 2,
     borderColor: '#7ab640',
-    backgroundColor: "#9bc870",
+    // backgroundColor: "#9bc870",
+    backgroundColor: '#cde4b7'
   },
   plantContent: {
     flex: 1,
@@ -133,7 +156,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start'
   },
   plantName: {
-    color: 'white',
     marginBottom: 5,
     fontSize: 20,
     fontWeight: 'bold',

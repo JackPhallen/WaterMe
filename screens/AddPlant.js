@@ -18,11 +18,13 @@ class AddPlant extends React.Component {
   }
 
   _onSubmit() {
-    console.log("submit");
+    let plantName = this.state.plantName;
+    let plantDesc = (typeof this.state.plantDesc !== 'undefined') ? this.state.plantDesc : this.state.plantName;
     this.props.actions$addPlant({
-      key: this.state.plantName,
-      desc: this.state.lastWatered
+      key: plantName,
+      desc: plantDesc
     });
+    this.props.actions$storePlants()
     this.props.navigation.goBack();
   }
 
@@ -36,11 +38,11 @@ class AddPlant extends React.Component {
             placeholder="My flower :)"
             onChangeText={(text) => this.setState({plantName: text})}
           />
-          <Text style={ styles.label }>Date last watered: </Text>
+          <Text style={ styles.label }>Description: </Text>
           <TextInput
             style={ styles.input }
             placeholder="Today"
-            onChangeText={(text) => this.setState({lastWatered: text})}
+            onChangeText={(text) => this.setState({plantDesc: text})}
           />
           <Text style={ styles.label }>How Often: </Text>
           <TextInput
