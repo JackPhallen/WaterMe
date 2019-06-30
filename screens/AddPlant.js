@@ -1,57 +1,67 @@
 import React from 'react';
 import { Button, View, Text, StyleSheet, TextInput, TouchableOpacity, StackActions, NavigationActions } from "react-native";
-import PlantList from '../plants/PlantList';
+import {Navigation} from 'react-native-navigation';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 
-export default class AddPlant extends React.Component {
-  static navigationOptions = ({ navigation }) => {
-    console.log("tes");
-    return {
-      title: 'Add Plant',
-      headerMode: 'none',
-    }
-  }; 
+import * as Actions from '../plants.actions';
+
+class AddPlant extends React.Component {
+  
+  constructor(props) {
+    super(props);
+    this.state = {}
+  }
+
   render() {
-    console.log(this.props.data);
     return (
-        <View style={ styles.main }>
-          <View style={ styles.formCont }>
-            <Text style={ styles.label }>Name Your Plant: </Text>
-            <TextInput
+      <View style={ styles.main }>
+        <View style={ styles.formCont }>
+          <Text style={ styles.label }>Name Your Plant: </Text>
+          <TextInput
             style={ styles.input }
             placeholder="My flower :)"
             onChangeText={(text) => this.setState({plantName: text})}
-            />
-            <Text style={ styles.label }>Date last watered: </Text>
-            <TextInput
+          />
+          <Text style={ styles.label }>Date last watered: </Text>
+          <TextInput
             style={ styles.input }
             placeholder="Today"
             onChangeText={(text) => this.setState({lastWatered: text})}
-            />
-            <Text style={ styles.label }>How Often: </Text>
-            <TextInput
+          />
+          <Text style={ styles.label }>How Often: </Text>
+          <TextInput
             style={ styles.input }
             placeholder="Every Day"
             onChangeText={(text) => this.setState({freq: text})}
-            />
-          </View>
-          <TouchableOpacity 
-            style={
-              [styles.button,
-              { backgroundColor: '#40b5b6' }]
-            }
-            onPress={ () => { this.props.navigation.goBack(); }} >
-            <Text style={styles.buttonText}>Add Plant</Text>
-          </TouchableOpacity>
+          />
         </View>
-      );
-  }
+        <TouchableOpacity 
+          style={
+            [styles.button,
+            { backgroundColor: '#40b5b6' }]
+          }
+          onPress={ () => { this.props.navigation.goBack(); }} >
+          <Text style={styles.buttonText}>Add Plant</Text>
+        </TouchableOpacity>
+      </View>
+    );  
+   }
 
-  state = {
-    plantName: "test",
-    lastWatered: "test",
-    freq: ""
-  }
+
 }
+
+function mapStateToProps(state) {
+  return {
+    plants: state.plants
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(Actions, dispatch);
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AddPlant);
 
 
 

@@ -1,25 +1,16 @@
 import React from 'react';
-import { createBottomTabNavigator, createStackNavigator, Text} from 'react-navigation';
-
-import MyPlants from '../screens/MyPlants';
+import { createBottomTabNavigator, createStackNavigator, createAppContainer} from 'react-navigation';
+import PlantList from '../screens/PlantList';
 import AddPlant from '../screens/AddPlant';
 import MyCalendar from '../screens/MyCalendar';
 
 
-const MyPlantsStack = createStackNavigator(
+const PlantListStack = createStackNavigator(
   {
-    Plants: {
-      screen: MyPlants,
+    List: {
+      screen: PlantList,
     },
-  },
-);
-
-const RootStack = createStackNavigator(
-  {
-    Main: {
-      screen: MyPlantsStack,
-    },
-    AddModal: {
+    Add: {
       screen: AddPlant,
     },
   },
@@ -28,57 +19,6 @@ const RootStack = createStackNavigator(
     headerMode: 'none',
   }
 );
-
-const CalendarStack = createStackNavigator(
-  {
-    Calendar: MyCalendar,
-  },
-  {
-    initialRouteName: 'Calendar',
-    defaultNavigationOptions: {
-      title: "To Do",
-      tabBarLabel: "Calendar",
-      headerStyle: {
-        backgroundColor: '#7ab640',
-      },
-      tabBarOptions: {
-        tabBarLabel: "YEET",
-      },
-      headerTintColor: '#fff',
-      headerTitleStyle: {
-        fontWeight: 'bold',
-      },
-    },
-  }
-)
-
-
-
-const TabNavigator = createBottomTabNavigator(
-  {
-    Plants: { 
-      screen: RootStack,
-      navigationOptions: {
-        tabBarLabel: "Plants",
-      }
-    },
-    ToDo: {
-      screen: CalendarStack,
-      navigationOptions: {
-        tabBarLabel: "Calendar",
-      }
-    }
-  },
-  {
-    tabBarOptions: {
-      labelStyle: {
-        fontSize: 20,
-      },
-      activeTintColor: "#7ab640",
-    },
-  }
-);
-
-
-export default TabNavigator;
+  
+export default createAppContainer(PlantListStack);
 
