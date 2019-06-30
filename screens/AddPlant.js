@@ -1,16 +1,29 @@
 import React from 'react';
 import { Button, View, Text, StyleSheet, TextInput, TouchableOpacity, StackActions, NavigationActions } from "react-native";
-import {Navigation} from 'react-native-navigation';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
-import * as Actions from '../plants.actions';
+import * as Actions from '../actions/plants.actions';
 
 class AddPlant extends React.Component {
   
+  static navigationOptions = {
+    headerMode: 'none',
+  };
+
   constructor(props) {
     super(props);
+    this._onSubmit = this._onSubmit.bind(this);
     this.state = {}
+  }
+
+  _onSubmit() {
+    console.log("submit");
+    this.props.actions$addPlant({
+      key: this.state.plantName,
+      desc: this.state.lastWatered
+    });
+    this.props.navigation.goBack();
   }
 
   render() {
@@ -33,7 +46,7 @@ class AddPlant extends React.Component {
           <TextInput
             style={ styles.input }
             placeholder="Every Day"
-            onChangeText={(text) => this.setState({freq: text})}
+            // onChangeText={(text) => this.setState({freq: text})}
           />
         </View>
         <TouchableOpacity 
@@ -41,7 +54,7 @@ class AddPlant extends React.Component {
             [styles.button,
             { backgroundColor: '#40b5b6' }]
           }
-          onPress={ () => { this.props.navigation.goBack(); }} >
+          onPress={ () => { this._onSubmit() }} >
           <Text style={styles.buttonText}>Add Plant</Text>
         </TouchableOpacity>
       </View>
@@ -61,7 +74,8 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators(Actions, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AddPlant);
+let AddPlantContainer = connect(mapStateToProps, mapDispatchToProps)(AddPlant);
+export default AddPlantContainer;
 
 
 
