@@ -16,6 +16,15 @@ const PlantListStack = createStackNavigator(
   },
   {
     mode: 'modal',
+    defaultNavigationOptions: {
+      headerStyle: {
+        backgroundColor: '#7ab640',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      },
+    }
   }
 );
 

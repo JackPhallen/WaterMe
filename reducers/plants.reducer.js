@@ -1,8 +1,6 @@
-import {AsyncStorage} from 'react-native';
-
 import * as Storage from '../utils/StoreData';
-
-const plantDataKey = "PlantData";
+import moment from "moment";
+import { apisAreAvailable } from 'expo';
 
 export default function (state = [], action) {
   switch (action.type) {
@@ -17,8 +15,22 @@ export default function (state = [], action) {
     case 'GET_PLANTS':
       return state;
     case 'ADD_PLANT':
+      action.newPlant.key = (1 + state.length).toString();
       return [...state,
-      action.newPlant]
+        action.newPlant];
+    case 'WATER_PLANT':  
+      return state.map((plant) => {
+          if (plant.key === action.plant.key) {
+            plant.nextWaterDate = moment().add(plant.intervalDays, "days").format();
+            console.log(plant);
+          }
+          return plant;
+        });
+    case 'SORT_PLANTS':
+        state = state.sort((a,b) => {
+          return moment(a.nextWaterDate).diff(moment(b.nextWaterDate), 'days');
+        });
+      return state;
     default:
       return state;
   }

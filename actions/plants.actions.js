@@ -1,12 +1,3 @@
-
-let idTracker = 2;
-
-// export function actions$fetchPlants() {
-//   return {
-//     type: 'FETCH_PLANTS',
-//   };
-// }
-
 export function actions$storePlants() {
   return {
     type: 'STORE_PLANTS',
@@ -27,10 +18,21 @@ export function actions$getPlants() {
 }
 
 export function actions$addPlant(plant) {
-  plant.id = 1 + idTracker;
-  idTracker = idTracker + 1;
   return {
     type: 'ADD_PLANT',
     newPlant: plant
+  };
+}
+
+export function actions$waterPlant(plant) {
+  return {
+    type: 'WATER_PLANT',
+    plant: plant
+  };
+}
+
+export function actions$sortPlants() {
+  return {
+    type: 'SORT_PLANTS'
   };
 }

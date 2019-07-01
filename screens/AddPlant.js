@@ -1,7 +1,8 @@
 import React from 'react';
-import { Button, View, Text, StyleSheet, TextInput, TouchableOpacity, StackActions, NavigationActions } from "react-native";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
+import moment from "moment";
 
 import * as Actions from '../actions/plants.actions';
 
@@ -18,13 +19,18 @@ class AddPlant extends React.Component {
   }
 
   _onSubmit() {
-    let plantName = this.state.plantName;
-    let plantDesc = (typeof this.state.plantDesc !== 'undefined') ? this.state.plantDesc : this.state.plantName;
+    let today = moment();
+    let name = this.state.plantName;
+    let lastWatered = today;
+    let intervalDays = this.state.freq;
+    let nextWaterDate = lastWatered.add(intervalDays, 'day');
     this.props.actions$addPlant({
-      key: plantName,
-      desc: plantDesc
+      name: name,
+      intervalDays: intervalDays,
+      nextWaterDate: nextWaterDate.format()
     });
-    this.props.actions$storePlants()
+    this.props.actions$sortPlants();
+    this.props.actions$storePlants();
     this.props.navigation.goBack();
   }
 
@@ -32,23 +38,24 @@ class AddPlant extends React.Component {
     return (
       <View style={ styles.main }>
         <View style={ styles.formCont }>
-          <Text style={ styles.label }>Name Your Plant: </Text>
+          <Text style={ styles.label }>Name your plant: </Text>
           <TextInput
             style={ styles.input }
-            placeholder="My flower :)"
+            placeholder="My Kitchen Violets"
             onChangeText={(text) => this.setState({plantName: text})}
           />
-          <Text style={ styles.label }>Description: </Text>
+          <Text style={ styles.label }>Last day watered: </Text>
           <TextInput
             style={ styles.input }
-            placeholder="Today"
+            placeholder= { moment(new Date()).format("YYYY-MM-DD") }
             onChangeText={(text) => this.setState({plantDesc: text})}
           />
-          <Text style={ styles.label }>How Often: </Text>
+          <Text style={ styles.label }>Watering interval (days): </Text>
           <TextInput
             style={ styles.input }
             placeholder="Every Day"
-            // onChangeText={(text) => this.setState({freq: text})}
+            keyboardType='numeric'
+            onChangeText={(text) => this.setState({freq: text})}
           />
         </View>
         <TouchableOpacity 
@@ -95,7 +102,7 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
   },
   label: {
-    fontSize: 40,
+    fontSize: 30,
   },
   input: {
     padding: 5,

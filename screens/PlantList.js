@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, Button, StyleSheet, FlatList, TouchableOpacity, Image} from 'react-native';
+import {View, Text, Button, StyleSheet, FlatList, TouchableOpacity, TouchableHighlight,  Image} from 'react-native';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
@@ -11,28 +11,35 @@ class PlantList extends React.Component {
     const { params = {} } = navigation.state;
     return {
       title: 'My Plants',
-      headerStyle: {
-        backgroundColor: '#7ab640',
-      },
-      headerTintColor: '#fff',
-      headerTitleStyle: {
-        fontWeight: 'bold',
-      },
       headerLeft: (
-        <Button
+        <TouchableOpacity  
+          style={{ padding: 5 }}
           onPress={() => params.onAddPlant() }
-          title="Add"
-          color="#fff"
-          fontWeight='bold'
-        />
+        >
+          <Image 
+            source={ require('../assets/addition-icon.png') }
+            style={{ 
+              flex: 1,
+              padding: 2,
+              width: 40,
+              height: 40,
+              resizeMode: 'contain' }} />
+        </TouchableOpacity>
       ),
       headerRight: (
-        <Button
-          onPress={() => alert('This is a button!')}
-          title="Edit"
-          color="#fff"
-          fontWeight='bold'
-        />
+        <TouchableOpacity  
+          style={{ padding: 5 }}
+          onPress={() => params.onAddPlant() }
+        >
+          <Image 
+            source={ require('../assets/edit-icon.png') }
+            style={{ 
+              flex: 1,
+              padding: 2,
+              width: 32,
+              height: 32,
+              resizeMode: 'contain' }} />
+        </TouchableOpacity>
       ),
     }
   }
@@ -63,9 +70,9 @@ class PlantList extends React.Component {
     });
   }
 
-
   _onAddPlant() {
     this.props.navigation.navigate('AddPlant');
+    // this.props.actions$sortPlants();
   }
 
   _onPlantPress(plant) {
@@ -74,6 +81,11 @@ class PlantList extends React.Component {
 
   _onPlantLongPress(plant) {
     console.log("long");
+  }
+
+  _onWaterPlant(plant) {
+    this.props.actions$waterPlant(plant);
+    this.props.actions$sortPlants();
   }
 
   render() {
@@ -86,24 +98,28 @@ class PlantList extends React.Component {
             <FlatList
               data={ this.props.plants }
               renderItem={ ({ item }) => 
-                <View>
-                  <TouchableOpacity 
-                    style={ styles.plant }
-                    onPress={ () => this._onPlantPress( item )}
-                    onLongPress={ () => this._onPlantLongPress( item )}
+                <View style={ styles.plant }>
+                  <View style={ styles.plantContent }>
+                    <TouchableOpacity  
+                      style={ styles.imageCont }
+                      onPress={() => this._onWaterPlant(item) }
                     >
-                    <View style={ styles.plantContent }>
-                      <View style={ styles.imageCont }>
                       <Image 
-                        source={ require('../assets/flower-icon.png') }
+                        source={ require('../assets/wateringcan-icon.png') }
                         style={ styles.image } />
-                      </View>
-                        <View style={ styles.plantDesc }>
-                          <Text style={ styles.plantName }> { item.key } </Text>
+                    </TouchableOpacity>
+                    {/* </View> */}
+                      <View style={ styles.plantDesc }>
+                        <TouchableOpacity
+                        style={{ flex:1 }}
+                        onPress={ () => this._onPlantPress() }
+                        onLongPress={ () => this._onPlantLongPress() }
+                        >
+                          <Text style={ styles.plantName }> { item.name } </Text>
                           <Text style={ styles.plantInfo }> { item.desc } </Text>
-                        </View>
-                    </View>
-                  </TouchableOpacity>
+                        </TouchableOpacity>
+                      </View>
+                  </View>
                 </View>
               }/>
           </View>
@@ -153,7 +169,7 @@ const styles = StyleSheet.create({
   plantDesc: {
     flex: 1,
     padding: 5,
-    justifyContent: 'flex-start'
+    justifyContent: 'flex-start',
   },
   plantName: {
     marginBottom: 5,
@@ -161,13 +177,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   imageCont: {
-    padding: 5,
+    padding: 10,
   },
   image: {
     flex: 1,
-    width: 95,
-    height: 95,
-    resizeMode: 'contain'
+    width: 56,
+    height: 56,
+    resizeMode: 'contain',
   },
   nameCont: {
     flex: 8,
