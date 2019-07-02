@@ -1,7 +1,8 @@
 import React from 'react';
-import {View, Text, Button, StyleSheet, FlatList, TouchableOpacity, TouchableHighlight,  Image} from 'react-native';
+import {View, Text, Button, StyleSheet, FlatList, TouchableOpacity, Alert,  Image} from 'react-native';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
+import moment from "moment";
 
 import * as Storage from '../utils/StoreData'
 import * as Actions from '../actions/plants.actions';
@@ -76,17 +77,92 @@ class PlantList extends React.Component {
   }
 
   _onPlantPress(plant) {
-    console.log("press");
+    // this.props.actions$deletePlant(plant);
   }
 
   _onPlantLongPress(plant) {
-    console.log("long");
+    Alert.alert(
+      'Are you sure?',
+      plant.name + ' will be deleted!',
+      [
+        {text: 'Cancel', onPress: () => {}},
+        {text: 'Yes', onPress: () => this._onDelete(plant)},
+      ],
+      {cancelable: false},
+    );
+  }
+
+  _onDelete(plant) {
+    this.props.actions$deletePlant(plant);
+    this.props.actions$sortPlants();
+    this.props.actions$storePlants();
   }
 
   _onWaterPlant(plant) {
     this.props.actions$waterPlant(plant);
     this.props.actions$sortPlants();
+    this.props.actions$storePlants();
   }
+
+  _alertOnWater(plant) {
+    Alert.alert(
+      'Are you sure?',
+      'Your ' + plant.name + ' does not need to be watered until ' 
+        + moment(plant.nextWaterDate).format('LLL'),
+      [
+        {text: 'Cancel', onPress: () => {}},
+        {text: 'Yes', onPress: () => this._onWaterPlant(plant)},
+      ],
+      {cancelable: false},
+    );
+  }
+
+  _renderPlant = ({ item }) => {
+    let daysUntilWater = moment(item.nextWaterDate).diff(moment(), 'days');
+    let iconImg;
+    let onIconPress;
+    let nextWaterStr = "Needs watered ";
+    if (daysUntilWater > 2) {
+      onIconPress = () => { this._alertOnWater(item) };
+      iconImg = require('../assets/drop-disabled2-icon.png');
+      nextWaterStr = nextWaterStr + moment(item.nextWaterDate).format('LL');
+    } else {
+      onIconPress = () => this._onWaterPlant(item)
+      iconImg = require('../assets/drop-icon.png');
+      if (daysUntilWater < 1) {
+        nextWaterStr = nextWaterStr + "today!"; 
+      } else if (daysUntilWater < 2) {
+        nextWaterStr = nextWaterStr + "tomorrow!";
+      } else {
+        nextWaterStr = nextWaterStr + moment(item.nextWaterDate).format('LL');
+      }
+    }
+    return (
+      <View style={ styles.plant }>
+        <View style={ styles.plantContent }>
+          <TouchableOpacity  
+            style={ styles.imageCont }
+            onPress={ (item) => onIconPress(item) }
+          >
+            <Image 
+              source={ iconImg }
+              style={ styles.image } />
+          </TouchableOpacity>
+          <View style={ styles.plantDesc }>
+            <TouchableOpacity
+              style={{ flex:1 }}
+              onPress={ () => this._onPlantPress() }
+              onLongPress={ () => this._onPlantLongPress(item) }
+            >
+              <Text style={ styles.plantName }> { item.name } </Text>
+              <Text style={ styles.plantInfo }> { nextWaterStr } </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    )
+  }
+  
 
   render() {
     if (this.state.loading) { 
@@ -97,31 +173,7 @@ class PlantList extends React.Component {
           <View style={ styles.plantList }>
             <FlatList
               data={ this.props.plants }
-              renderItem={ ({ item }) => 
-                <View style={ styles.plant }>
-                  <View style={ styles.plantContent }>
-                    <TouchableOpacity  
-                      style={ styles.imageCont }
-                      onPress={() => this._onWaterPlant(item) }
-                    >
-                      <Image 
-                        source={ require('../assets/wateringcan-icon.png') }
-                        style={ styles.image } />
-                    </TouchableOpacity>
-                    {/* </View> */}
-                      <View style={ styles.plantDesc }>
-                        <TouchableOpacity
-                        style={{ flex:1 }}
-                        onPress={ () => this._onPlantPress() }
-                        onLongPress={ () => this._onPlantLongPress() }
-                        >
-                          <Text style={ styles.plantName }> { item.name } </Text>
-                          <Text style={ styles.plantInfo }> { item.desc } </Text>
-                        </TouchableOpacity>
-                      </View>
-                  </View>
-                </View>
-              }/>
+              renderItem={ this._renderPlant } />
           </View>
         </View>
       );

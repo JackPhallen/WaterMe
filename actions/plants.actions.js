@@ -24,6 +24,13 @@ export function actions$addPlant(plant) {
   };
 }
 
+export function actions$deletePlant(plant) {
+  return {
+    type: 'DELETE_PLANT',
+    key: plant.key
+  }
+}
+
 export function actions$waterPlant(plant) {
   return {
     type: 'WATER_PLANT',

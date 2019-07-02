@@ -3,10 +3,10 @@ import moment from "moment";
 import { apisAreAvailable } from 'expo';
 
 export default function (state = [], action) {
+  if ( !state ) {
+    state = [];
+  }
   switch (action.type) {
-    // case "FETCH_PLANTS":
-    //   Storage.retrieveData();
-    //   return state;
     case "STORE_PLANTS":
       Storage.storeData(state);
       return state;
@@ -18,6 +18,10 @@ export default function (state = [], action) {
       action.newPlant.key = (1 + state.length).toString();
       return [...state,
         action.newPlant];
+    case 'DELETE_PLANT':
+        return state.filter(( plant ) => {
+          return plant.key !== action.key;
+      });
     case 'WATER_PLANT':  
       return state.map((plant) => {
           if (plant.key === action.plant.key) {

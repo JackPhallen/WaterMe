@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import moment from "moment";
+import DateTimePicker from "react-native-modal-datetime-picker";
 
 import * as Actions from '../actions/plants.actions';
 
@@ -15,13 +16,16 @@ class AddPlant extends React.Component {
   constructor(props) {
     super(props);
     this._onSubmit = this._onSubmit.bind(this);
-    this.state = {}
+    this._toggleDateComponent = this._toggleDateComponent.bind(this);
+    this.state = {
+      displayDateComponent: false,
+      dateSelection: moment().format('MM-DD-YY')
+    }
   }
-
   _onSubmit() {
-    let today = moment();
+    if ( !this._validateInput() ) { return }
     let name = this.state.plantName;
-    let lastWatered = today;
+    let lastWatered = moment(this.state.dateSelection);
     let intervalDays = this.state.freq;
     let nextWaterDate = lastWatered.add(intervalDays, 'day');
     this.props.actions$addPlant({
@@ -34,6 +38,31 @@ class AddPlant extends React.Component {
     this.props.navigation.goBack();
   }
 
+  _validateInput() {
+    let freq = +this.state.freq;
+    if ( !freq && freq > 0) {
+      return true;
+    }
+    Alert.alert(
+      'Invalid input',
+      this.state.freq + " is not a positive number!",
+      [
+        {text: 'Ok', onPress: () => {}},
+      ],
+      {cancelable: false},
+    );
+    return false;
+  }
+
+  _toggleDateComponent() {
+    this.setState({ displayDateComponent: !this.state.displayDateComponent });
+  };
+
+  _onDateConfirm = date => {
+    this.setState({ dateSelection: date });
+    this._toggleDateComponent();
+  };
+
   render() {
     return (
       <View style={ styles.main }>
@@ -44,20 +73,27 @@ class AddPlant extends React.Component {
             placeholder="My Kitchen Violets"
             onChangeText={(text) => this.setState({plantName: text})}
           />
-          <Text style={ styles.label }>Last day watered: </Text>
-          <TextInput
-            style={ styles.input }
-            placeholder= { moment(new Date()).format("YYYY-MM-DD") }
-            onChangeText={(text) => this.setState({plantDesc: text})}
-          />
           <Text style={ styles.label }>Watering interval (days): </Text>
           <TextInput
             style={ styles.input }
-            placeholder="Every Day"
-            keyboardType='numeric'
+            placeholder="14"
             onChangeText={(text) => this.setState({freq: text})}
           />
         </View>
+        <TouchableOpacity
+            onPress={ () => this._toggleDateComponent() }
+            style={[
+              styles.button,
+              { backgroundColor: '#77b3d4' }
+            ]}
+          >
+            <Text style={styles.buttonText}>Select Date Last Watered</Text>
+          </TouchableOpacity>
+          <DateTimePicker
+            isVisible= { this.state.displayDateComponent }
+            onConfirm= { this._onDateConfirm }
+            onCancel= { this._toggleDateComponent }
+        />
         <TouchableOpacity 
           style={
             [styles.button,
