@@ -26,7 +26,6 @@ export default function (state = [], action) {
       return state.map((plant) => {
           if (plant.key === action.plant.key) {
             plant.nextWaterDate = moment().add(plant.intervalDays, "days").format();
-            console.log(plant);
           }
           return plant;
         });

@@ -11,14 +11,17 @@ class PlantList extends React.Component {
   static navigationOptions = ({ navigation }) => {
     const { params = {} } = navigation.state;
     return {
-      title: 'My Plants',
+      headerTitle: <Image
+        source={require('../assets/flower2-icon.png')}
+        style={{ width: 40, height: 40, padding: 2 }}
+      />,
       headerLeft: (
         <TouchableOpacity  
           style={{ padding: 5 }}
           onPress={() => params.onAddPlant() }
         >
           <Image 
-            source={ require('../assets/addition-icon.png') }
+            source={ require('../assets/add-plant-icon.png') }
             style={{ 
               flex: 1,
               padding: 2,
@@ -26,22 +29,7 @@ class PlantList extends React.Component {
               height: 40,
               resizeMode: 'contain' }} />
         </TouchableOpacity>
-      ),
-      headerRight: (
-        <TouchableOpacity  
-          style={{ padding: 5 }}
-          onPress={() => params.onAddPlant() }
-        >
-          <Image 
-            source={ require('../assets/edit-icon.png') }
-            style={{ 
-              flex: 1,
-              padding: 2,
-              width: 32,
-              height: 32,
-              resizeMode: 'contain' }} />
-        </TouchableOpacity>
-      ),
+      )
     }
   }
       
@@ -73,7 +61,6 @@ class PlantList extends React.Component {
 
   _onAddPlant() {
     this.props.navigation.navigate('AddPlant');
-    // this.props.actions$sortPlants();
   }
 
   _onPlantPress(plant) {
@@ -124,7 +111,7 @@ class PlantList extends React.Component {
     let nextWaterStr = "Needs watered ";
     if (daysUntilWater > 2) {
       onIconPress = () => { this._alertOnWater(item) };
-      iconImg = require('../assets/drop-disabled2-icon.png');
+      iconImg = require('../assets/drop-disabled3-icon.png');
       nextWaterStr = nextWaterStr + moment(item.nextWaterDate).format('LL');
     } else {
       onIconPress = () => this._onWaterPlant(item)

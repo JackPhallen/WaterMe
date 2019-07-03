@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Image } from "react-native";
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import moment from "moment";
@@ -19,7 +19,7 @@ class AddPlant extends React.Component {
     this._toggleDateComponent = this._toggleDateComponent.bind(this);
     this.state = {
       displayDateComponent: false,
-      dateSelection: moment().format('MM-DD-YY')
+      dateSelection: moment()
     }
   }
   _onSubmit() {
@@ -40,7 +40,7 @@ class AddPlant extends React.Component {
 
   _validateInput() {
     let freq = +this.state.freq;
-    if ( !freq && freq > 0) {
+    if ( freq && freq > 0) {
       return true;
     }
     Alert.alert(
@@ -64,6 +64,7 @@ class AddPlant extends React.Component {
   };
 
   render() {
+    let lastWateredStr = moment(this.state.dateSelection).format('LL')
     return (
       <View style={ styles.main }>
         <View style={ styles.formCont }>
@@ -79,15 +80,29 @@ class AddPlant extends React.Component {
             placeholder="14"
             onChangeText={(text) => this.setState({freq: text})}
           />
-        </View>
-        <TouchableOpacity
+          <Text style={ styles.label }>Date last watered: </Text>
+          <TouchableOpacity
             onPress={ () => this._toggleDateComponent() }
             style={[
               styles.button,
-              { backgroundColor: '#77b3d4' }
+              { backgroundColor: 'white',
+                borderWidth: 1,
+                alignItems: "flex-start",
+                textAlign: 'center',}
             ]}
           >
-            <Text style={styles.buttonText}>Select Date Last Watered</Text>
+            <View style={ styles.calendarView }>
+              <Image 
+                source={ require('../assets/calendar-icon.png') }
+                style={ styles.image } />
+              <Text 
+                style={{
+                  fontSize: 20,
+                  color: 'black',
+                  fontWeight: 'bold', 
+                }}
+              >{ lastWateredStr }</Text>
+            </View>
           </TouchableOpacity>
           <DateTimePicker
             isVisible= { this.state.displayDateComponent }
@@ -97,11 +112,20 @@ class AddPlant extends React.Component {
         <TouchableOpacity 
           style={
             [styles.button,
-            { backgroundColor: '#40b5b6' }]
+            { backgroundColor: '#696969',
+              justifyContent: "center",
+              alignItems: "center",
+              textAlign: 'center', }]
           }
           onPress={ () => { this._onSubmit() }} >
-          <Text style={styles.buttonText}>Add Plant</Text>
+          <Text 
+          style={{ 
+            fontSize: 20,
+            color: 'white',
+            fontWeight: 'bold', 
+          }}>Add Plant</Text>
         </TouchableOpacity>
+        </View>
       </View>
     );  
    }
@@ -145,25 +169,27 @@ const styles = StyleSheet.create({
     height: 40,
     fontSize: 20,
     backgroundColor: '#fbfdf9',
-    borderRadius: 10,
     marginBottom: 10,
   },
-  buttonCont: {
-    flex:1, 
-    flexDirection: 'row', 
-    justifyContent: 'space-evenly'
+  calendarView: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+  image: {
+    height: 30,
+    width: 30,
+    resizeMode: 'contain',
+    marginRight: 40
   },
   button: {
     margin: 15,
-    flex: 1,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    textAlign: 'center',
-    borderWidth: 1,
+    padding: 5,
+    height: 40,
   },
   buttonText: {
-    color: 'white',
+    color: 'black',
     fontWeight: 'bold',
   }
 });
